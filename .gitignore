@@ -1,0 +1,37 @@
+*.o
+*.syntastic*
+*.ycm*
+/check
+/seedgen
+tags
+lib
+exe
+
+#Begin Visual Studio Garbage
+.vs
+*.suo
+*.sdf
+*.opensdf
+*.opendb
+*.obj
+*.iobj
+*.ipdb
+/Win32
+/ipch
+*.ipch
+*.user
+*.aps
+*.pdb
+*.bsc
+*.log
+*.tlog
+*.idb
+*.lastbuildstate
+*.ilk
+x64
+x86
+build
+#End Visual studio Garbage
+
+*.exe
+*.lib

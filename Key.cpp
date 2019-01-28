@@ -4,6 +4,8 @@
 #include "SyscallWrapper.h"
 #include "Path.h"
 #include "KeyNotFoundException.h"
+#include "AccessDeniedException.h"
+#include "ValueNotFoundException.h"
 
 using libreg::Key;
 using libreg::MultiString;
@@ -11,12 +13,14 @@ using libreg::Access;
 using libreg::Handle;
 using libreg::Hive;
 using libreg::ValueType;
+using libreg::SyscallFailure;
+using libreg::KeyNotFoundException;
+using libreg::AccessDeniedException;
 
 
 Key::Key(Handle<HKEY>&& handle, libreg::Hive hive, const MultiString& path) 
   : _handle(std::make_unique<Handle<HKEY>>(std::move(handle))), _hive(hive), _path(path)
 {
-
 }
 
 void Key::QueryInfo(const Handle<HKEY>& key,
@@ -69,10 +73,7 @@ Key Key::Open(libreg::Hive hive, const MultiString& path, Access access)
   }
   catch (const SyscallFailure& e)
   {
-    if (e.ReturnValue() == ERROR_FILE_NOT_FOUND)
-    {
-      throw KeyNotFoundException(hive, path, e);
-    }
+    HandleException(e, hive, path, false);
   }
 
   return Key(key, hive, path);
@@ -82,16 +83,23 @@ Key Key::Create(libreg::Hive hive, const MultiString& path, Access access, bool 
 {
   HKEY key = nullptr;
 
-  Syscall(RegCreateKeyExW,
-    reinterpret_cast<HKEY>(hive),
-    path.Raw(),
-    0,
-    nullptr, //lpClass
-    volatile_key ? REG_OPTION_VOLATILE : 0,
-    static_cast<DWORD>(access), // regSamDesired
-    nullptr, // lpSecurityAttributes
-    &key,
-    nullptr);
+  try
+  {
+    Syscall(RegCreateKeyExW,
+      reinterpret_cast<HKEY>(hive),
+      path.Raw(),
+      0,
+      nullptr, //lpClass
+      volatile_key ? REG_OPTION_VOLATILE : 0,
+      static_cast<DWORD>(access), // regSamDesired
+      nullptr, // lpSecurityAttributes
+      &key,
+      nullptr);
+  }
+  catch (const SyscallFailure& e)
+  {
+    HandleException(e, hive, path, false);
+  }
 
   return Key(key, hive, path);
 }
@@ -205,15 +213,51 @@ Key Key::OpenSubKey(const MultiString& name, Access access) const
 {
   HKEY subkey = nullptr;
 
-  Syscall(RegOpenKeyExW,
-    _handle->Get(),
-    name.Raw(),
-    0,
-    static_cast<DWORD>(access),
-    &subkey
-  );
+  try
+  {
+    Syscall(RegOpenKeyExW,
+      _handle->Get(),
+      name.Raw(),
+      0,
+      static_cast<DWORD>(access),
+      &subkey
+    );
+  }
+  catch (const SyscallFailure& e)
+  {
+    HandleException(e, _hive, _path, false);
+  }
 
   return Key(subkey, _hive, Path::Concat(_path, name));
+}
+
+Key Key::CreateSubKey(const MultiString& name, bool volatile_key)
+{
+  HKEY subkey = nullptr;
+  try
+  {
+    Syscall(RegCreateKeyExW,
+      _handle->Get(), //hKey
+      name.Raw(), // lpSubkey
+      0, // dwReserved
+      nullptr, //lpClass
+      volatile_key ? REG_OPTION_VOLATILE : 0, //dwOptions
+      0, //samDesired
+      nullptr, //lpSecurityAttributes
+      &subkey, //phKey
+      nullptr); // lpCreationDisposition
+  }
+  catch (const SyscallFailure& e)
+  {
+    HandleException(e, _hive, _path, false);
+  }
+
+  return Key(Handle<HKEY>(subkey), _hive, Path::Concat(_path, name));
+}
+
+Key Key::OpenOrCreateSubkey(const MultiString& name, Access access, bool volatile_key)
+{
+  return OpenOrCreate(_hive, Path::Concat(_path, name), access, volatile_key);
 }
 
 const MultiString& Key::Path() const
@@ -228,13 +272,20 @@ Hive Key::Hive() const
 
 void Key::SetValueImpl(const MultiString& name, const void* data, size_t size, ValueType type)
 {
-  Syscall(RegSetValueExW,
-    _handle->Get(), // hKey
-    name.Raw(), // lpValueName
-    0, // reserved
-    static_cast<DWORD>(type), // dwType,
-    reinterpret_cast<const BYTE*>(data), //lpData,
-    static_cast<DWORD>(size)); //cbData
+  try
+  {
+    Syscall(RegSetValueExW,
+      _handle->Get(), // hKey
+      name.Raw(), // lpValueName
+      0, // reserved
+      static_cast<DWORD>(type), // dwType,
+      reinterpret_cast<const BYTE*>(data), //lpData,
+      static_cast<DWORD>(size)); //cbData
+  }
+  catch (const SyscallFailure& e)
+  {
+    HandleException(e, _hive, _path, true);
+  }
 }
 
 void Key::GetValueImpl(const MultiString& name, void* data, size_t& size, ValueType expected_type)
@@ -255,14 +306,21 @@ void Key::GetValueImpl(const MultiString& name, void* data, size_t& size, ValueT
   auto mask = masks.find(expected_type);
   assert(mask != masks.end());
 
-  Syscall(RegGetValueW,
-    _handle->Get(), // hKey
-    nullptr, // lpSubkey
-    name.Raw(), //lpValue
-    mask->second, // dwFlags
-    nullptr, // pdwType
-    data, // pvData
-    &dwSize); // pcdData
+  try
+  {
+    Syscall(RegGetValueW,
+      _handle->Get(), // hKey
+      nullptr, // lpSubkey
+      name.Raw(), //lpValue
+      mask->second, // dwFlags
+      nullptr, // pdwType
+      data, // pvData
+      &dwSize); // pcdData
+  }
+  catch (const SyscallFailure& e)
+  {
+    HandleException(e, _hive, _path, true);
+  }
 
   size = static_cast<size_t>(dwSize);
 }
@@ -282,17 +340,54 @@ void Key::SetValue(const MultiString& name, const MultiString& value, ValueType 
   SetValueImpl(name, value.Raw(), sizeof(wchar_t) * (value.Value().size() + 1), type);
 }
 
-void Key::Delete()
+void Key::DeleteSubKey(const MultiString& name)
 {
-  Syscall(RegDeleteTreeW,
-    _handle->Get(),
-    nullptr);
+  try
+  {
+    Syscall(RegDeleteTreeW,
+      _handle->Get(),
+      name.Raw());
+  }
+  catch (const SyscallFailure& e)
+  {
+    HandleException(e, _hive, _path, false);
+  }
 }
 
 void Key::DeleteValue(const MultiString& name)
 {
-  Syscall(RegDeleteValueW,
-    _handle->Get(),
-    name.Raw()
-  );
+  try
+  {
+    Syscall(RegDeleteValueW,
+      _handle->Get(),
+      name.Raw()
+    );
+  }
+  catch (const SyscallFailure& e)
+  {
+    HandleException(e, _hive, _path, true);
+  }
+}
+
+void Key::HandleException(const SyscallFailure& ex, libreg::Hive hive, const MultiString& path, bool value)
+{
+  if (ex.ReturnValue() == ERROR_FILE_NOT_FOUND)
+  {
+    if (value)
+    {
+      throw ValueNotFoundException(hive, path, ex);
+    }
+    else
+    {
+      throw KeyNotFoundException(hive, path, ex);
+    }
+  }
+  else if (ex.ReturnValue() == ERROR_ACCESS_DENIED)
+  {
+    throw AccessDeniedException(hive, path, ex);
+  }
+  else
+  {
+    throw ex;
+  }
 }

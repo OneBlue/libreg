@@ -8,9 +8,10 @@ namespace libreg
   inline DWORD Key::GetValue<DWORD>(const MultiString& name, ValueType expected_type)
   {
     DWORD value = 0;
-    size_t size = 0;
+    size_t size = sizeof(DWORD);
 
     GetValueImpl(name, &value, size, expected_type);
+    assert(size == sizeof(DWORD));
 
     return value;
   }

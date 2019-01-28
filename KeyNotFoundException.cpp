@@ -1,3 +1,4 @@
+#include <sstream>
 #include "KeyNotFoundException.h"
 
 using libreg::KeyNotFoundException;
@@ -5,7 +6,7 @@ using libreg::MultiString;
 using libreg::SyscallFailure;
 
 KeyNotFoundException::KeyNotFoundException(libreg::Hive hive, const MultiString& path, const SyscallFailure& inner) 
-  : _hive(hive), _path(path), _inner(inner)
+  : _hive(hive), _path(path), _inner(inner), _message(BuildMessage(hive, path, inner))
 {
 }
 
@@ -27,4 +28,15 @@ libreg::Hive KeyNotFoundException::Hive() const
 const SyscallFailure& KeyNotFoundException::Inner() const
 {
   return _inner;
+}
+
+std::string KeyNotFoundException::BuildMessage(libreg::Hive hive,
+                                               const MultiString& path,
+                                               const SyscallFailure& inner)
+{
+  std::stringstream str;
+
+  str << "Key: \"" << hive << "\\" << path.Raw() << " not found. " << inner.what();
+
+  return str.str();
 }

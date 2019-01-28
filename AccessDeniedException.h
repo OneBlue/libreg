@@ -7,10 +7,10 @@
 
 namespace libreg
 {
-  class KeyNotFoundException : public std::exception
+  class AccessDeniedException : public std::exception
   {
   public:
-    KeyNotFoundException(libreg::Hive hive, const MultiString& path, const SyscallFailure& inner);
+    AccessDeniedException(libreg::Hive hive, const MultiString& path, const SyscallFailure& inner);
 
     const char* what() const noexcept override;
     
@@ -19,7 +19,7 @@ namespace libreg
     const SyscallFailure& Inner() const;
 
   private:
-    static std::string BuildMessage(libreg::Hive hive, const MultiString& path, const SyscallFailure& inner);
+    std::string BuildMessage(libreg::Hive hive, const MultiString& path, const SyscallFailure& inner);
 
     libreg::Hive _hive;
     MultiString  _path;

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Access.h" />
+    <ClInclude Include="AccessDeniedException.h" />
     <ClInclude Include="Defs.h" />
     <ClInclude Include="Handle.h" />
     <ClInclude Include="Handle.hxx" />
@@ -32,14 +33,18 @@
     <ClInclude Include="SyscallFailure.h" />
     <ClInclude Include="SyscallWrapper.h" />
     <ClInclude Include="SyscallWrapper.hxx" />
+    <ClInclude Include="ValueNotFoundException.h" />
     <ClInclude Include="ValueType.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AccessDeniedException.cpp" />
+    <ClCompile Include="Hive.cpp" />
     <ClCompile Include="Key.cpp" />
     <ClCompile Include="KeyNotFoundException.cpp" />
     <ClCompile Include="MultiString.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="SyscallFailure.cpp" />
+    <ClCompile Include="ValueNotFoundException.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

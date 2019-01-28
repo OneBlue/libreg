@@ -7,10 +7,10 @@
 
 namespace libreg
 {
-  class KeyNotFoundException : public std::exception
+  class ValueNotFoundException : public std::exception
   {
   public:
-    KeyNotFoundException(libreg::Hive hive, const MultiString& path, const SyscallFailure& inner);
+    ValueNotFoundException(libreg::Hive hive, const MultiString& path, const SyscallFailure& inner);
 
     const char* what() const noexcept override;
     

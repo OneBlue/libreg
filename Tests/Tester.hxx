@@ -43,8 +43,8 @@ bool Tester::TestThrow(const std::function<void()>& routine, const std::string& 
   catch (const T& ex)
   {
     _passed++;
-    std::cout << Colors::Green() << "PASSED: " << name << std::endl;
-    std::cout << Colors::Reset();
+    std::cout << Colors::Green() << "PASSED: " << name << " (ex.what() == \"" << ex.what() << "\")";
+    std::cout << std::endl << Colors::Reset();
 
     return true;
   }

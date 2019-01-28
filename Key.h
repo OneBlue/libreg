@@ -26,7 +26,7 @@ namespace libreg
         std::vector<Key> SubKeys(Access access = Access::read) const;
         std::vector<std::pair<MultiString, ValueType>> Values() const;
         Key OpenSubKey(const MultiString& name, Access access) const;
-        Key CreateSubKey(const MultiString& name, bool volatile_key);
+        Key CreateSubKey(const MultiString& name, bool volatile_key = false);
         Key OpenOrCreateSubkey(const MultiString& name, Access access, bool volatile_key);
 
         void SetValue(const MultiString& name, DWORD value, ValueType type);

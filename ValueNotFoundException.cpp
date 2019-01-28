@@ -35,7 +35,7 @@ std::string ValueNotFoundException::BuildMessage(libreg::Hive hive,
                                                const SyscallFailure& inner)
 {
   std::stringstream str;
-  str << "Value: \"" << hive << "\\" << path.Raw() << " not found. " << inner.what();
+  str << "Value: \"" << hive << "\\" << path << " not found. " << inner.what();
 
   return str.str();
 }

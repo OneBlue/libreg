@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <Windows.h>
 
 namespace libreg
@@ -14,4 +15,6 @@ namespace libreg
     Expand_sz = REG_EXPAND_SZ,
     Binary = REG_BINARY,
   };
+
+  std::ostream& operator<<(std::ostream& stream, ValueType type);
 }

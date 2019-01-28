@@ -25,6 +25,7 @@
     <ClInclude Include="Handle.h" />
     <ClInclude Include="Handle.hxx" />
     <ClInclude Include="Hive.h" />
+    <ClInclude Include="IncompatibleValueTypeException.h" />
     <ClInclude Include="Key.h" />
     <ClInclude Include="Key.hxx" />
     <ClInclude Include="KeyNotFoundException.h" />
@@ -39,12 +40,14 @@
   <ItemGroup>
     <ClCompile Include="AccessDeniedException.cpp" />
     <ClCompile Include="Hive.cpp" />
+    <ClCompile Include="IncompatibleValueTypeException.cpp" />
     <ClCompile Include="Key.cpp" />
     <ClCompile Include="KeyNotFoundException.cpp" />
     <ClCompile Include="MultiString.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="SyscallFailure.cpp" />
     <ClCompile Include="ValueNotFoundException.cpp" />
+    <ClCompile Include="ValueType.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

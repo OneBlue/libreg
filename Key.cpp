@@ -6,6 +6,7 @@
 #include "KeyNotFoundException.h"
 #include "AccessDeniedException.h"
 #include "ValueNotFoundException.h"
+#include "IncompatibleValueTypeException.h"
 
 using libreg::Key;
 using libreg::MultiString;
@@ -225,7 +226,7 @@ Key Key::OpenSubKey(const MultiString& name, Access access) const
   }
   catch (const SyscallFailure& e)
   {
-    HandleException(e, _hive, _path, false);
+    HandleException(e, _hive, Path::Concat(_path, name), false);
   }
 
   return Key(subkey, _hive, Path::Concat(_path, name));
@@ -242,7 +243,7 @@ Key Key::CreateSubKey(const MultiString& name, bool volatile_key)
       0, // dwReserved
       nullptr, //lpClass
       volatile_key ? REG_OPTION_VOLATILE : 0, //dwOptions
-      0, //samDesired
+      KEY_ALL_ACCESS, //samDesired
       nullptr, //lpSecurityAttributes
       &subkey, //phKey
       nullptr); // lpCreationDisposition
@@ -290,8 +291,6 @@ void Key::SetValueImpl(const MultiString& name, const void* data, size_t size, V
 
 void Key::GetValueImpl(const MultiString& name, void* data, size_t& size, ValueType expected_type)
 {
-  DWORD dwSize = static_cast<DWORD>(size);
-
   static const std::map<ValueType, DWORD> masks
   {
     {ValueType::None, RRF_RT_ANY},
@@ -305,6 +304,9 @@ void Key::GetValueImpl(const MultiString& name, void* data, size_t& size, ValueT
 
   auto mask = masks.find(expected_type);
   assert(mask != masks.end());
+  
+  DWORD dwSize = static_cast<DWORD>(size);
+  DWORD dwType = 0;
 
   try
   {
@@ -313,13 +315,18 @@ void Key::GetValueImpl(const MultiString& name, void* data, size_t& size, ValueT
       nullptr, // lpSubkey
       name.Raw(), //lpValue
       mask->second, // dwFlags
-      nullptr, // pdwType
+      &dwType, // pdwType
       data, // pvData
       &dwSize); // pcdData
   }
   catch (const SyscallFailure& e)
   {
-    HandleException(e, _hive, _path, true);
+    if (e.ReturnValue() == ERROR_UNSUPPORTED_TYPE)
+    {
+      ValueType actualType = static_cast<ValueType>(dwType);
+      throw IncompatibleValueTypeException(_hive, Path::Concat(_path, name), expected_type, actualType, e);
+    }
+    HandleException(e, _hive, Path::Concat(_path, name), true);
   }
 
   size = static_cast<size_t>(dwSize);
@@ -332,7 +339,7 @@ void Key::SetValue(const MultiString& name, DWORD value, ValueType type)
 
 void Key::SetValue(const MultiString& name, const std::vector<std::uint8_t>& value, ValueType type)
 {
-  SetValueImpl(name, &value, sizeof(DWORD), type);
+  SetValueImpl(name, value.data(), value.size(), type);
 }
 
 void Key::SetValue(const MultiString& name, const MultiString& value, ValueType type)

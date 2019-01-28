@@ -36,7 +36,7 @@ std::string KeyNotFoundException::BuildMessage(libreg::Hive hive,
 {
   std::stringstream str;
 
-  str << "Key: \"" << hive << "\\" << path.Raw() << " not found. " << inner.what();
+  str << "Key: \"" << hive << "\\" << path << " not found. " << inner.what();
 
   return str.str();
 }

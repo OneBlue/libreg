@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <ostream>
 
 namespace libreg
 {
@@ -13,10 +14,16 @@ namespace libreg
 
     const std::wstring& Value() const;
     const wchar_t* Raw() const;
+    
+    static std::string Convert(const std::wstring& input);
+    bool operator==(const MultiString& other) const;
+    bool operator!=(const MultiString& other) const;
 
   private:
     static std::wstring Convert(const std::string& input);
 
     std::wstring _value;
   };
+
+  std::ostream& operator<<(std::ostream& stream, const MultiString& string);
 }

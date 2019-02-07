@@ -46,28 +46,6 @@ static bool RunTestSuite(std::vector<std::unique_ptr<Tester>>& tests)
 
 int main()
 {
-  auto key = Key::OpenOrCreate(Hive::CurrentUser, "Software\\libreg", Access::AllAccess, true);
-
-  key.SetValue("foo", "bar", ValueType::Sz);
-  key.SetValue("fo2", 1337, ValueType::Dword);
-  key.SetValue("fo3", std::vector<std::uint8_t>{1, 3, 3, 7}, ValueType::Binary);
-
-  auto v = key.GetValue<MultiString>("foo");
-
-
-  for (const auto& e : Key::Open(Hive::Root, "*", Access::Read).SubKeys())
-  {
-    std::wcout << e.Path().Value() << std::endl;
-  }
-
-  auto k2 = Key::Open(Hive::Root, "*", Access::Read);
-
-  for (const auto& e : k2.Values())
-  {
-    std::wcout << e.first.Value() << "(" << (int)e.second << ")";
-    std::wcout << " = " << k2.GetValue<MultiString>(e.first).Value() << std::endl;
-  }
-
   std::vector<std::unique_ptr<Tester>> tests;
   tests.emplace_back(std::make_unique<test::TestRegistryOperations>());
 

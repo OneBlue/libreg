@@ -12,7 +12,7 @@ static const std::map<ValueType, std::string> mappings
   {ValueType::Qword, "Dword"},
   {ValueType::Multi_sz, "Multi_sz"},
   {ValueType::Expand_sz, "Expand_sz"},
-  {ValueType::Binary, "binary"}
+  {ValueType::Binary, "Binary"}
 };
 
 std::ostream& libreg::operator<<(std::ostream& stream, ValueType type)

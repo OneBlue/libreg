@@ -33,7 +33,7 @@ const SyscallFailure& AccessDeniedException::Inner() const
 std::string AccessDeniedException::BuildMessage(libreg::Hive hive, const MultiString& path, const SyscallFailure& inner)
 {
   std::stringstream str;
-  str << "Access denied when accessing key: \"" << hive << "\\" << path << " not found. " << inner.what();
+  str << "Access denied when accessing key: \"" << hive << "\\" << path << ", details: " << inner.what();
 
   return str.str();
 }

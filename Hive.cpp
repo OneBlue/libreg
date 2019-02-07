@@ -8,10 +8,10 @@ using libreg::Hive;
 static const std::map<Hive, std::string> mappings
 {
   {Hive::Root, "HKEY_CLASSES_ROOT"},
-  {Hive::Local_machine, "HKEY_LOCAL_MACHINE"},
+  {Hive::LocalMachine, "HKEY_LOCAL_MACHINE"},
   {Hive::Users, "HKEY_USERS"},
-  {Hive::Current_user, "HKEY_CURRENT_USER"},
-  {Hive::Current_config, "HKEY_CURRENT_CONFIG"},
+  {Hive::CurrentUser, "HKEY_CURRENT_USER"},
+  {Hive::CurrentConfig, "HKEY_CURRENT_CONFIG"},
 };
 
 std::ostream& libreg::operator<<(std::ostream& stream, Hive hive)

@@ -46,7 +46,7 @@ static bool RunTestSuite(std::vector<std::unique_ptr<Tester>>& tests)
 
 int main()
 {
-  auto key = Key::OpenOrCreate(Hive::Current_user, "Software\\libreg", Access::all_access, true);
+  auto key = Key::OpenOrCreate(Hive::CurrentUser, "Software\\libreg", Access::AllAccess, true);
 
   key.SetValue("foo", "bar", ValueType::Sz);
   key.SetValue("fo2", 1337, ValueType::Dword);
@@ -55,12 +55,12 @@ int main()
   auto v = key.GetValue<MultiString>("foo");
 
 
-  for (const auto& e : Key::Open(Hive::Root, "*", Access::read).SubKeys())
+  for (const auto& e : Key::Open(Hive::Root, "*", Access::Read).SubKeys())
   {
     std::wcout << e.Path().Value() << std::endl;
   }
 
-  auto k2 = Key::Open(Hive::Root, "*", Access::read);
+  auto k2 = Key::Open(Hive::Root, "*", Access::Read);
 
   for (const auto& e : k2.Values())
   {

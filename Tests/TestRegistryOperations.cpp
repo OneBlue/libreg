@@ -18,10 +18,10 @@ void TestRegistryOperations::RunImpl()
 {
   auto dummy_key = "Software";
 
-  auto key = Key::OpenOrCreate(Hive::Current_user, dummy_key, Access::all_access);
+  auto key = Key::OpenOrCreate(Hive::CurrentUser, dummy_key, Access::AllAccess);
   key.DeleteSubKey("libreg");
 
-  key = Key::Create(Hive::Current_user, "Software\\libreg", Access::all_access, true);
+  key = Key::Create(Hive::CurrentUser, "Software\\libreg", Access::AllAccess, true);
 
   key.SetValue("foo", "bar", ValueType::Sz);
   Test(true, std::wstring(L"bar") ==  key.GetValue<MultiString>("foo").Value(), "Read dword key");
@@ -74,13 +74,13 @@ void TestRegistryOperations::RunImpl()
 
   Test(true, std::wstring(L"default-value") == subkey.GetValue<MultiString>("").Value(), "Subkey default value is set");
 
-  auto read_only_key = Key::Open(Hive::Local_machine, "Software", Access::query_value);
+  auto read_only_key = Key::Open(Hive::LocalMachine, "Software", Access::QueryValue);
 
   TestThrow<AccessDeniedException>([&]() {read_only_key.CreateSubKey("denied"); },
     "AccessDeniedException is thrown");
-  TestThrow<KeyNotFoundException>([&]() {read_only_key.OpenSubKey("does-not-exist", Access::read); },
+  TestThrow<KeyNotFoundException>([&]() {read_only_key.OpenSubKey("does-not-exist", Access::Read); },
     "KeyNotFoundException is thrown");
 
-  TestThrow<AccessDeniedException>([&]() {Key::Open(Hive::Local_machine, "Software", Access::all_access); },
+  TestThrow<AccessDeniedException>([&]() {Key::Open(Hive::LocalMachine, "Software", Access::AllAccess); },
     "AccessDeniedException is thrown if key access is refused");
 }

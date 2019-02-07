@@ -7,19 +7,19 @@ namespace libreg
 {
     enum class Access : DWORD
     {
-        all_access = KEY_ALL_ACCESS,
-        create_sub_key = KEY_CREATE_SUB_KEY,
-        enumerate_sub_key = KEY_ENUMERATE_SUB_KEYS,
-        read = KEY_READ,
-        query_value = KEY_QUERY_VALUE,
-        set_value = KEY_SET_VALUE,
-        write = KEY_WRITE,
+        AllAccess = KEY_ALL_ACCESS,
+        CreateSubKey = KEY_CREATE_SUB_KEY,
+        EnumerateSubKey = KEY_ENUMERATE_SUB_KEYS,
+        Read = KEY_READ,
+        QueryValue = KEY_QUERY_VALUE,
+        SetValue = KEY_SET_VALUE,
+        Write = KEY_WRITE,
     };
 
     enum class Wow64Access : DWORD
     {
-        key_32_bits = KEY_WOW64_32KEY,
-        key_64_bits = KEY_WOW64_64KEY
+        Key32Bits = KEY_WOW64_32KEY,
+        Key64Bits = KEY_WOW64_64KEY
     };
 
     template <typename TLeft, typename TRight>

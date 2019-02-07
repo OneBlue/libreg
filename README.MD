@@ -56,3 +56,4 @@ void Example()
 	// Delete a key
 	key.DeleteSubKey("sub-key");
 }
+```

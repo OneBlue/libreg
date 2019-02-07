@@ -80,4 +80,7 @@ void TestRegistryOperations::RunImpl()
     "AccessDeniedException is thrown");
   TestThrow<KeyNotFoundException>([&]() {read_only_key.OpenSubKey("does-not-exist", Access::read); },
     "KeyNotFoundException is thrown");
+
+  TestThrow<AccessDeniedException>([&]() {Key::Open(Hive::Local_machine, "Software", Access::all_access); },
+    "AccessDeniedException is thrown if key access is refused");
 }

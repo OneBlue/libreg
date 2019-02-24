@@ -51,4 +51,10 @@ namespace libreg
     {
         return static_cast<Access>(static_cast<DWORD>(left) | static_cast<DWORD>(right));
     }
+
+    template <typename TLeft, typename TRight>
+    std::enable_if_t<IsAccessFlag<TLeft, TRight>::value, bool> operator& (TLeft left, TRight right)
+    {
+      return static_cast<DWORD>(left) & static_cast<DWORD>(right);
+    }
 }

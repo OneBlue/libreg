@@ -21,3 +21,11 @@ std::ostream& libreg::operator<<(std::ostream& stream, Hive hive)
 
   return (stream << it->second.c_str());
 }
+
+std::wostream& libreg::operator<<(std::wostream& stream, Hive hive)
+{
+  auto it = mappings.find(hive);
+  assert(it != mappings.end());
+
+  return (stream << it->second.c_str());
+}

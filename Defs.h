@@ -1,9 +1,5 @@
 #pragma once
 
-namespace libreg
-{
-    class Defs
-    {
 
-    };
-}
+#pragma comment(lib, "libreg.lib")
+#pragma comment(lib, "Dbghelp.lib")

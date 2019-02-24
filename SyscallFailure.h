@@ -7,7 +7,7 @@ namespace libreg
   class SyscallFailure : public std::exception
   {
   public:
-    SyscallFailure(const std::string& syscall, const std::string& argumentss, long return_value, long last_error);
+    SyscallFailure(const std::string& syscall, const std::string& arguments, long return_value, long last_error);
 
     const char* what() const noexcept override;
     long ReturnValue() const;

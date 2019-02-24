@@ -8,6 +8,7 @@
 #include "Access.h"
 #include "ValueType.h"
 #include "SyscallFailure.h"
+#include "Defs.h"
 
 namespace libreg
 {
@@ -38,9 +39,12 @@ namespace libreg
 
         void DeleteSubKey(const MultiString& name);
         void DeleteValue(const MultiString& name);
+        void Delete();
+
+        Access Access() const;
 
     private:
-        Key(Handle<HKEY>&& handle, libreg::Hive hive, const MultiString& path);
+        Key(Handle<HKEY>&& handle, libreg::Hive hive, const MultiString& path, libreg::Access access);
 
         void SetValueImpl(const MultiString& name, const void* data, size_t size, ValueType type);
         void GetValueImpl(const MultiString& name, void* data, size_t& size, ValueType type);
@@ -49,6 +53,7 @@ namespace libreg
         std::shared_ptr<Handle<HKEY>> _handle;
         libreg::Hive _hive;
         MultiString _path;
+        libreg::Access _access;
     };
 }
 

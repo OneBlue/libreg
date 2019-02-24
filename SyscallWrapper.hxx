@@ -184,14 +184,32 @@ namespace libreg
       out << "(" << ValueToString(first) << ")";
     }
 
+    template <typename T>
+    inline long ConvertReturnValue(T value)
+    {
+      return value;
+    }
+
+    template <>
+    inline long ConvertReturnValue(HWND value)
+    {
+#pragma warning( push )
+#pragma warning( disable: 4311) 
+#pragma warning( disable: 4302) 
+      return reinterpret_cast<long>(value);
+#pragma warning( pop )
+    }
+
     template <typename Return, typename ...Args>
     inline void ThrowException(const void* address, Return ret, DWORD error, Args... args)
     {
       std::stringstream arguments;
       PrintArguments(arguments, std::forward<Args>(args)...);
 
-      throw SyscallFailure(SyscallName(address), arguments.str(), ret, error);
+      throw SyscallFailure(SyscallName(address), arguments.str(), ConvertReturnValue(ret), error);
     }
+
+
 
     template <typename Routine, typename Result, typename ...Args>
     inline typename std::result_of<Routine(Args...)>::type SyscallImpl(Routine routine,

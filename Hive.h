@@ -16,4 +16,5 @@ namespace libreg
   };
 
   std::ostream& operator<<(std::ostream& stream, Hive hive);
+  std::wostream& operator<<(std::wostream& stream, Hive hive);
 }

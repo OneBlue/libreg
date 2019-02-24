@@ -1,8 +1,10 @@
 #pragma once
 
+
 #include <type_traits>
 #include <functional>
 #include "SyscallFailure.h"
+#include "Defs.h"
 
 namespace libreg
 {

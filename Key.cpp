@@ -19,8 +19,8 @@ using libreg::KeyNotFoundException;
 using libreg::AccessDeniedException;
 
 
-Key::Key(Handle<HKEY>&& handle, libreg::Hive hive, const MultiString& path) 
-  : _handle(std::make_unique<Handle<HKEY>>(std::move(handle))), _hive(hive), _path(path)
+Key::Key(Handle<HKEY>&& handle, libreg::Hive hive, const MultiString& path, libreg::Access access) 
+  : _handle(std::make_unique<Handle<HKEY>>(std::move(handle))), _hive(hive), _path(path), _access(access)
 {
 }
 
@@ -60,7 +60,7 @@ void Key::QueryInfo(const Handle<HKEY>& key,
   assign(max_data_bytes, dwMaxValueLen);
 }
 
-Key Key::Open(libreg::Hive hive, const MultiString& path, Access access)
+Key Key::Open(libreg::Hive hive, const MultiString& path, libreg::Access access)
 {
   HKEY key = nullptr;
   try
@@ -77,10 +77,10 @@ Key Key::Open(libreg::Hive hive, const MultiString& path, Access access)
     HandleException(e, hive, path, false);
   }
 
-  return Key(key, hive, path);
+  return Key(key, hive, path, access);
 }
 
-Key Key::Create(libreg::Hive hive, const MultiString& path, Access access, bool volatile_key)
+Key Key::Create(libreg::Hive hive, const MultiString& path, libreg::Access access, bool volatile_key)
 {
   HKEY key = nullptr;
 
@@ -102,10 +102,10 @@ Key Key::Create(libreg::Hive hive, const MultiString& path, Access access, bool 
     HandleException(e, hive, path, false);
   }
 
-  return Key(key, hive, path);
+  return Key(key, hive, path, access);
 }
 
-Key Key::OpenOrCreate(libreg::Hive hive, const MultiString& path, Access access, bool volatile_key)
+Key Key::OpenOrCreate(libreg::Hive hive, const MultiString& path, libreg::Access access, bool volatile_key)
 {
   try
   {
@@ -167,7 +167,7 @@ std::vector<std::pair<MultiString, ValueType>> Key::Values() const
   return values;
 }
 
-std::vector<Key> Key::SubKeys(Access access) const
+std::vector<Key> Key::SubKeys(libreg::Access access) const
 {
   size_t max_subkey_size = 0;
   QueryInfo(*_handle, &max_subkey_size, nullptr, nullptr);
@@ -210,7 +210,7 @@ std::vector<Key> Key::SubKeys(Access access) const
   return keys;
 }
 
-Key Key::OpenSubKey(const MultiString& name, Access access) const
+Key Key::OpenSubKey(const MultiString& name, libreg::Access access) const
 {
   HKEY subkey = nullptr;
 
@@ -229,7 +229,7 @@ Key Key::OpenSubKey(const MultiString& name, Access access) const
     HandleException(e, _hive, Path::Concat(_path, name), false);
   }
 
-  return Key(subkey, _hive, Path::Concat(_path, name));
+  return Key(subkey, _hive, Path::Concat(_path, name), access);
 }
 
 Key Key::CreateSubKey(const MultiString& name, bool volatile_key)
@@ -253,10 +253,10 @@ Key Key::CreateSubKey(const MultiString& name, bool volatile_key)
     HandleException(e, _hive, _path, false);
   }
 
-  return Key(Handle<HKEY>(subkey), _hive, Path::Concat(_path, name));
+  return Key(Handle<HKEY>(subkey), _hive, Path::Concat(_path, name), Access::AllAccess);
 }
 
-Key Key::OpenOrCreateSubkey(const MultiString& name, Access access, bool volatile_key)
+Key Key::OpenOrCreateSubkey(const MultiString& name, libreg::Access access, bool volatile_key)
 {
   return OpenOrCreate(_hive, Path::Concat(_path, name), access, volatile_key);
 }
@@ -366,14 +366,34 @@ void Key::DeleteValue(const MultiString& name)
   try
   {
     Syscall(RegDeleteValueW,
-      _handle->Get(),
-      name.Raw()
+      _handle->Get(), // hKey
+      name.Raw() // lpSubKey
     );
   }
   catch (const SyscallFailure& e)
   {
     HandleException(e, _hive, _path, true);
   }
+}
+
+void Key::Delete()
+{
+  try
+  {
+    Syscall(RegDeleteTreeW,
+      reinterpret_cast<HKEY>(_hive), // hKey
+      _path.Raw() // lpSubKey
+    );
+  }
+  catch (const SyscallFailure& e)
+  {
+    HandleException(e, _hive, _path, false);
+  }
+}
+
+Access Key::Access() const
+{
+  return _access;
 }
 
 void Key::HandleException(const SyscallFailure& ex, libreg::Hive hive, const MultiString& path, bool value)

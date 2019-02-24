@@ -19,7 +19,13 @@ void TestRegistryOperations::RunImpl()
   auto dummy_key = "Software";
 
   auto key = Key::OpenOrCreate(Hive::CurrentUser, dummy_key, Access::AllAccess);
-  key.DeleteSubKey("libreg");
+  try
+  {
+    key.DeleteSubKey("libreg");
+  }
+  catch (const KeyNotFoundException&)
+  {
+  }
 
   key = Key::Create(Hive::CurrentUser, "Software\\libreg", Access::AllAccess, true);
 
@@ -73,6 +79,11 @@ void TestRegistryOperations::RunImpl()
   subkey.SetValue("", "default-value", ValueType::Sz);
 
   Test(true, std::wstring(L"default-value") == subkey.GetValue<MultiString>("").Value(), "Subkey default value is set");
+
+  subkey.Delete();
+  Test<size_t>(0, key.SubKeys().size(), "Subkey was deleted");
+
+  TestThrow<KeyNotFoundException>([&](){subkey.Delete();}, "Keys can't be deleted twice");
 
   auto read_only_key = Key::Open(Hive::LocalMachine, "Software", Access::QueryValue);
 

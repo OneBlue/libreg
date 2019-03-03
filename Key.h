@@ -22,6 +22,7 @@ namespace libreg
 
         const Handle<HKEY>& NativeHandle() const;
         const MultiString& Path() const;
+        MultiString Name() const;
         Hive Hive() const;
 
         std::vector<Key> SubKeys(Access access = Access::Read) const;

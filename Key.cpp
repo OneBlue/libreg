@@ -266,6 +266,19 @@ const MultiString& Key::Path() const
   return _path;
 }
 
+MultiString libreg::Key::Name() const
+{
+  // Search for last '\' in string
+  auto end = _path.Value().find_last_of('\\');
+
+  if (end == std::string::npos)
+  {
+    return Path(); // If not found, then the key is a root key, return full path
+  }
+
+  return _path.Value().substr(end + 1);
+}
+
 Hive Key::Hive() const
 {
   return _hive;
@@ -314,7 +327,7 @@ void Key::GetValueImpl(const MultiString& name, void* data, size_t& size, ValueT
       _handle->Get(), // hKey
       nullptr, // lpSubkey
       name.Raw(), //lpValue
-      mask->second, // dwFlags
+      mask->second | RRF_NOEXPAND, // dwFlags
       &dwType, // pdwType
       data, // pvData
       &dwSize); // pcdData

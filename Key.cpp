@@ -302,7 +302,7 @@ void Key::SetValueImpl(const MultiString& name, const void* data, size_t size, V
   }
 }
 
-void Key::GetValueImpl(const MultiString& name, void* data, size_t& size, ValueType expected_type)
+void Key::GetValueImpl(const MultiString& name, void* data, size_t& size, ValueType expected_type) const
 {
   static const std::map<ValueType, DWORD> masks
   {

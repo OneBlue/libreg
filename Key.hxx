@@ -5,7 +5,7 @@
 namespace libreg
 {
   template <>
-  inline DWORD Key::GetValue<DWORD>(const MultiString& name, ValueType expected_type)
+  inline DWORD Key::GetValue<DWORD>(const MultiString& name, ValueType expected_type) const
   {
     DWORD value = 0;
     size_t size = sizeof(DWORD);
@@ -17,7 +17,7 @@ namespace libreg
   }
 
   template <>
-  inline std::vector<std::uint8_t> Key::GetValue<std::vector<std::uint8_t>>(const MultiString& name, ValueType expected_type)
+  inline std::vector<std::uint8_t> Key::GetValue<std::vector<std::uint8_t>>(const MultiString& name, ValueType expected_type) const
   {
     size_t max_value_size = 0;
     QueryInfo(*_handle, nullptr, nullptr, &max_value_size);
@@ -29,7 +29,7 @@ namespace libreg
   }
 
   template <>
-  inline MultiString Key::GetValue<MultiString>(const MultiString& name, ValueType expected_type)
+  inline MultiString Key::GetValue<MultiString>(const MultiString& name, ValueType expected_type) const
   {
     size_t max_value_size = 0;
     QueryInfo(*_handle, nullptr, nullptr, &max_value_size);

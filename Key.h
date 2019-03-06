@@ -36,7 +36,7 @@ namespace libreg
         void SetValue(const MultiString& name, const MultiString& value, ValueType type);
 
         template <typename T>
-        T GetValue(const MultiString& name, ValueType expected_type = ValueType::None);
+        T GetValue(const MultiString& name, ValueType expected_type = ValueType::None) const;
 
         void DeleteSubKey(const MultiString& name);
         void DeleteValue(const MultiString& name);
@@ -48,7 +48,7 @@ namespace libreg
         Key(Handle<HKEY>&& handle, libreg::Hive hive, const MultiString& path, libreg::Access access);
 
         void SetValueImpl(const MultiString& name, const void* data, size_t size, ValueType type);
-        void GetValueImpl(const MultiString& name, void* data, size_t& size, ValueType type);
+        void GetValueImpl(const MultiString& name, void* data, size_t& size, ValueType type) const;
         static void HandleException(const SyscallFailure& ex, libreg::Hive hive, const MultiString& path, bool valueOperation);
 
         std::shared_ptr<Handle<HKEY>> _handle;

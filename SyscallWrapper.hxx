@@ -209,6 +209,14 @@ namespace libreg
       throw SyscallFailure(SyscallName(address), arguments.str(), ConvertReturnValue(ret), error);
     }
 
+    template <typename Return, typename ...Args>
+    inline void ThrowException(const char* name, Return ret, DWORD error, Args... args)
+    {
+      std::stringstream arguments;
+      PrintArguments(arguments, std::forward<Args>(args)...);
+
+      throw SyscallFailure(name, arguments.str(), ConvertReturnValue(ret), error);
+    }
 
 
     template <typename Routine, typename Result, typename ...Args>
@@ -275,5 +283,15 @@ namespace libreg
     using ReturnValue = typename std::result_of<Routine(Args...)>::type;
 
     return detail::SyscallImpl<Routine, ReturnValue, Args...>(routine, pred, std::forward<Args>(args)...);
+  }
+
+  template <typename T, typename... Args>
+  inline void ComCall(const char* exp, HRESULT(T::*routine)(Args...), T* self, Args... args)
+  {
+    auto result = (self->*routine)(args...);
+    if (!SUCCEEDED(result))
+    {
+      detail::ThrowException(exp, result, GetLastError(), std::forward<Args>(args)...);
+    }
   }
 }

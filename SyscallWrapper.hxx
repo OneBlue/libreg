@@ -286,7 +286,7 @@ namespace libreg
   }
 
   template <typename T, typename... Args>
-  inline void ComCall(const char* exp, HRESULT(T::*routine)(Args...), T* self, Args... args)
+  inline void ComCall(const char* exp, HRESULT(STDMETHODCALLTYPE T::*routine)(Args...), T* self, Args... args)
   {
     auto result = (self->*routine)(args...);
     if (!SUCCEEDED(result))

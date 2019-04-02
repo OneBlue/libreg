@@ -232,6 +232,36 @@ Key Key::OpenSubKey(const MultiString& name, libreg::Access access) const
   return Key(subkey, _hive, Path::Concat(_path, name), access);
 }
 
+std::optional<Key> Key::TryOpenSubKey(const MultiString& name, libreg::Access access) const
+{
+  auto pred = [](auto result)
+  {
+    return result == 0 || result == ERROR_FILE_NOT_FOUND;
+  };
+
+  HKEY subkey = nullptr;
+  try
+  {
+    if (SyscallWithExpectedReturn(RegOpenKeyExW,
+      pred,
+      _handle->Get(),
+      name.Raw(),
+      0,
+      static_cast<DWORD>(access),
+      &subkey
+    ) == ERROR_FILE_NOT_FOUND)
+    {
+      return {}; // Subkey does not exist
+    }
+  }
+  catch (const SyscallFailure& e)
+  {
+    HandleException(e, _hive, Path::Concat(_path, name), false);
+  }
+
+  return Key(subkey, _hive, Path::Concat(_path, name), access);
+}
+
 Key Key::CreateSubKey(const MultiString& name, bool volatile_key)
 {
   HKEY subkey = nullptr;

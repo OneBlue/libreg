@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <optional>
 #include "MultiString.h"
 #include "Handle.h"
 #include "Hive.h"
@@ -28,6 +29,7 @@ namespace libreg
         std::vector<Key> SubKeys(Access access = Access::Read) const;
         std::vector<std::pair<MultiString, ValueType>> Values() const;
         Key OpenSubKey(const MultiString& name, Access access) const;
+        std::optional<Key> TryOpenSubKey(const MultiString& name, Access access) const;
         Key CreateSubKey(const MultiString& name, bool volatile_key = false);
         Key OpenOrCreateSubkey(const MultiString& name, Access access, bool volatile_key);
 

@@ -5,7 +5,7 @@
 
 namespace libreg
 {
-  enum class ValueType
+  enum class ValueType : DWORD
   {
     None = 0,
     Sz = REG_SZ,

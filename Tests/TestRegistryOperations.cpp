@@ -28,9 +28,13 @@ void TestRegistryOperations::RunImpl()
   }
 
   key = Key::Create(Hive::CurrentUser, "Software\\libreg", Access::AllAccess, true);
+  Test(Hive::CurrentUser, key.Hive(), "Key hive is correct");
+  Test<std::wstring>(L"Software\\libreg", key.Path().Value(), "Key path is correct");
+  Test(static_cast<DWORD>(Access::AllAccess), static_cast<DWORD>(key.Access()), "Key access is correct");
 
   key.SetValue("foo", "bar", ValueType::Sz);
   Test(true, std::wstring(L"bar") ==  key.GetValue<MultiString>("foo").Value(), "Read dword key");
+  Test<std::wstring>(L"libreg", key.Name().Value(), "Key name is valid");
 
   key.SetValue("dword", 12, ValueType::Dword);
   Test<DWORD>(12, key.GetValue<DWORD>("dword"), "Read dword value");
@@ -71,6 +75,7 @@ void TestRegistryOperations::RunImpl()
 
 
   auto subkey = key.CreateSubKey("foo", true);
+  Test<std::wstring>(L"Software\\libreg\\foo", subkey.Path().Value(), "Subkey path is correct");
   std::vector<MultiString> expected = { "foo" };
 
   Test(Path::Concat(key.Path(), "foo"), key.SubKeys().front().Path(), "Sub key is created");
@@ -94,4 +99,12 @@ void TestRegistryOperations::RunImpl()
 
   TestThrow<AccessDeniedException>([&]() {Key::Open(Hive::LocalMachine, "Software", Access::AllAccess); },
     "AccessDeniedException is thrown if key access is refused");
+
+  auto top_level_key = Key::Open(Hive::LocalMachine, "", Access::Read);
+  Test<std::wstring>(L"", top_level_key.Name().Value(), "Top level key name is valid");
+
+  auto result = top_level_key.TryOpenSubKey("DoesntExist", Access::Read);
+  Test(false, result.has_value(), "TryOpenSubKey doesn't fail if the key is not found");
+
+  TestThrow<AccessDeniedException>([&]() {top_level_key.OpenSubKey("Software", Access::AllAccess);}, "TryOpenSubkey throws on AccessDenied");
 }

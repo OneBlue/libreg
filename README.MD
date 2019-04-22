@@ -2,11 +2,19 @@
 
 A modern, intuitive and simple C++ library to interact with the Windows registry
 
+## Nuget package
+Nuget package available from: `https://www.nuget.org/packages/libreg/1.0.0` .
+
 ## Build from source
 
 Run:
 ```
 $ msbuild libreg.sln
+```
+
+To build the nuget package, run: 
+```
+$ nuget pack
 ```
 
 The build output can be found in the `lib` folder.

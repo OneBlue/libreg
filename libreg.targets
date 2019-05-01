@@ -5,7 +5,7 @@
       <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\..\lib\native\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-        <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\lib\native\lib\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+        <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\lib\native\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
 </Project>

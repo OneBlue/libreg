@@ -14,6 +14,7 @@ namespace libreg
 
     const std::wstring& Value() const;
     const wchar_t* Raw() const;
+    std::string AsMultiByte() const;
     
     static std::string Convert(const std::wstring& input);
     bool operator==(const MultiString& other) const;

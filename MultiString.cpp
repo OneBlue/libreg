@@ -29,6 +29,11 @@ const wchar_t* MultiString::Raw() const
   return _value.c_str();
 }
 
+std::string libreg::MultiString::AsMultiByte() const
+{
+  return Convert(_value);
+}
+
 std::wstring MultiString::Convert(const std::string& input)
 {
   typedef std::codecvt_utf8<wchar_t> convert_type;

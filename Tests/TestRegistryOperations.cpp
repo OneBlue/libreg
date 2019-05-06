@@ -39,6 +39,12 @@ void TestRegistryOperations::RunImpl()
   key.SetValue("dword", 12, ValueType::Dword);
   Test<DWORD>(12, key.GetValue<DWORD>("dword"), "Read dword value");
 
+  key.SetValue("empty", std::vector<uint8_t>(), ValueType::Sz);
+  Test<std::string>("", key.GetValue<MultiString>("empty", libreg::ValueType::Sz).AsMultiByte(), "Read empty string value");
+
+  key.SetValue("qword", 12, ValueType::Qword);
+  Test<DWORDLONG>(12, key.GetValue<DWORDLONG>("qword", libreg::ValueType::Qword), "Read QWORD value");
+
   std::vector<uint8_t> binary{ 1, 3, 3, 7, 4, 2 };
 
   key.SetValue("binary", binary, ValueType::Binary);
@@ -47,6 +53,8 @@ void TestRegistryOperations::RunImpl()
   std::vector<std::pair<MultiString, ValueType>> values =
   {
     {"foo", ValueType::Sz},
+    {"qword", ValueType::Qword},
+    {"empty", ValueType::Sz},
     {"binary", ValueType::Binary},
     {"dword", ValueType::Dword},
   };

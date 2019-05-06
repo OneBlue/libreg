@@ -375,6 +375,40 @@ void Key::GetValueImpl(const MultiString& name, void* data, size_t& size, ValueT
   size = static_cast<size_t>(dwSize);
 }
 
+size_t Key::GetValueSize(const MultiString& name) const
+{
+  // Edge case: If an Sz value has been stored without \0, RegGetValue will inject a \0 so
+    // its size will be max_value_size += max_value_size
+    // Given that it's the same for multi_sz, we can't guess the maximum buffer (same for expand_sz if expansion is enabled)
+    // Calling RegGetValueW is simplier
+
+  auto routine = [](auto ret)
+  {
+    return ret == ERROR_MORE_DATA || ret == ERROR_SUCCESS;
+  };
+
+  DWORD dwSize = 0;
+  try
+  {
+    SyscallWithExpectedReturn(
+      RegGetValueW,
+      routine,
+      _handle->Get(), // hKey
+      nullptr, // lpSubkey
+      name.Raw(), //lpValue
+      RRF_RT_ANY | RRF_NOEXPAND, // dwFlags
+      nullptr, // pdwType
+      nullptr, // pvData
+      &dwSize); // pcdData
+  }
+  catch (const SyscallFailure & e)
+  {
+    HandleException(e, _hive, _path, true);
+  }
+
+  return static_cast<size_t>(dwSize);
+}
+
 void Key::SetValue(const MultiString& name, DWORD value, ValueType type)
 {
   SetValueImpl(name, &value, sizeof(DWORD), type);

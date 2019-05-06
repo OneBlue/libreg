@@ -51,6 +51,7 @@ namespace libreg
 
         void SetValueImpl(const MultiString& name, const void* data, size_t size, ValueType type);
         void GetValueImpl(const MultiString& name, void* data, size_t& size, ValueType type) const;
+        size_t GetValueSize(const MultiString& name) const;
         static void HandleException(const SyscallFailure& ex, libreg::Hive hive, const MultiString& path, bool valueOperation);
 
         std::shared_ptr<Handle<HKEY>> _handle;

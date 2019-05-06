@@ -154,7 +154,7 @@ namespace libreg
     template <>
     inline std::enable_if_t<std::is_pointer<const wchar_t*>::value, std::string> ValueToString<const wchar_t*>(const wchar_t* value)
     {
-      return "L\"" + std::string{ value, value + wcslen(value) } +"\"";
+      return "L\"" + MultiString::Convert(value) + "\"";
     }
 
     template <typename T>

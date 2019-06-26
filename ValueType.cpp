@@ -9,7 +9,7 @@ static const std::map<ValueType, std::string> mappings
   {ValueType::None, "None"},
   {ValueType::Sz, "Sz"},
   {ValueType::Dword, "Dword"},
-  {ValueType::Qword, "Dword"},
+  {ValueType::Qword, "Qword"},
   {ValueType::Multi_sz, "Multi_sz"},
   {ValueType::Expand_sz, "Expand_sz"},
   {ValueType::Binary, "Binary"}

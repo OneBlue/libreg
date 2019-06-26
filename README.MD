@@ -3,7 +3,7 @@
 A modern, intuitive and simple C++ library to interact with the Windows registry
 
 ## Nuget package
-Nuget package available from: `https://www.nuget.org/packages/libreg/1.0.0` .
+Nuget package available from: `https://www.nuget.org/packages/libreg` .
 
 ## Build from source
 

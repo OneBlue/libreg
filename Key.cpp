@@ -403,7 +403,7 @@ size_t Key::GetValueSize(const MultiString& name) const
   }
   catch (const SyscallFailure & e)
   {
-    HandleException(e, _hive, _path, true);
+    HandleException(e, _hive, Path::Concat(_path, name), true);
   }
 
   return static_cast<size_t>(dwSize);

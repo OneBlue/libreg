@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <functional>
+#include "MultiString.h"
 
 /* 
   This file contains the implementations details of Syscall.
@@ -73,6 +74,12 @@ namespace libreg
     inline bool CheckReturnValue(LSTATUS result)
     {
       return result == ERROR_SUCCESS;
+    }
+	
+	template <>
+    inline bool CheckReturnValue(UINT result)
+    {
+      return result == 0;
     }
 
     template <>

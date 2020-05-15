@@ -9,20 +9,20 @@
 namespace libreg
 {
   template <typename Routine, typename ...Args>
-  typename std::result_of<Routine(Args...)>::type Syscall(Routine routine, Args... args);
+  typename std::invoke_result_t<Routine, Args...> Syscall(Routine routine, Args... args);
 
   template <typename Routine, typename ...Args>
-  typename std::result_of<Routine(Args...)>::type
-  SyscallWithError(Routine routine, typename std::result_of<Routine(Args...)>::type error_value, Args... args);
+  typename  std::invoke_result_t<Routine, Args...>
+  SyscallWithError(Routine routine, typename  std::invoke_result_t<Routine, Args...> error_value, Args... args);
 
   template <typename Routine, typename ...Args>
-  typename std::result_of<Routine(Args...)>::type
-  SyscallWithExpectedReturn(Routine routine, typename std::result_of<Routine(Args...)>::type expected_value, Args... args);
+  typename  std::invoke_result_t<Routine, Args...>
+  SyscallWithExpectedReturn(Routine routine, typename  std::invoke_result_t<Routine, Args...> expected_value, Args... args);
 
   template <typename Routine, typename ...Args>
-  typename std::result_of<Routine(Args...)>::type
+  typename  std::invoke_result_t<Routine, Args...>
   SyscallWithExpectedReturn(Routine routine,
-      std::function<bool(typename std::result_of<Routine(Args...)>::type)> pred, Args... args);
+      std::function<bool(typename  std::invoke_result_t<Routine, Args...>)> pred, Args... args);
 
   template <typename T, typename... Args>
   void ComCall(const char* exp, HRESULT(T::*routine)(Args...), T* self, Args... args);

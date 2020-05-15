@@ -227,8 +227,8 @@ namespace libreg
 
 
     template <typename Routine, typename Result, typename ...Args>
-    inline typename std::result_of<Routine(Args...)>::type SyscallImpl(Routine routine,
-      const std::function<bool(typename std::result_of<Routine(Args...)>::type)>& check_result,
+    inline typename  std::invoke_result_t<Routine, Args...> SyscallImpl(Routine routine,
+      const std::function<bool(typename  std::invoke_result_t<Routine, Args...>)>& check_result,
       Args... args)
     {
       auto result = routine(args...);
@@ -244,19 +244,19 @@ namespace libreg
   }
 
   template <typename Routine, typename ...Args>
-  inline typename std::result_of<Routine(Args...)>::type Syscall(Routine routine, Args... args)
+  inline typename  std::invoke_result_t<Routine, Args...> Syscall(Routine routine, Args... args)
   {
-    using ReturnValue = typename std::result_of<Routine(Args...)>::type;
+    using ReturnValue = typename  std::invoke_result_t<Routine, Args...>;
 
     return detail::SyscallImpl<Routine, ReturnValue, Args...>(routine, detail::CheckReturnValue<ReturnValue>, std::forward<Args>(args)...);
   }
 
   template <typename Routine, typename ...Args>
-  inline typename std::result_of<Routine(Args...)>::type SyscallWithError(Routine routine,
-    typename std::result_of<Routine(Args...)>::type error_value,
+  inline typename  std::invoke_result_t<Routine, Args...> SyscallWithError(Routine routine,
+    typename  std::invoke_result_t<Routine, Args...> error_value,
     Args... args)
   {
-    using ReturnValue = typename std::result_of<Routine(Args...)>::type;
+    using ReturnValue = typename  std::invoke_result_t<Routine, Args...>;
 
     auto pred = [&error_value](decltype(error_value) result)
     {
@@ -267,11 +267,11 @@ namespace libreg
   }
 
   template <typename Routine, typename ...Args>
-  inline typename std::result_of<Routine(Args...)>::type SyscallWithExpectedReturn(Routine routine,
-    typename std::result_of<Routine(Args...)>::type expected,
+  inline typename  std::invoke_result_t<Routine, Args...> SyscallWithExpectedReturn(Routine routine,
+    typename  std::invoke_result_t<Routine, Args...> expected,
     Args... args)
   {
-    using ReturnValue = typename std::result_of<Routine(Args...)>::type;
+    using ReturnValue = typename  std::invoke_result_t<Routine, Args...>;
 
     auto pred = [&expected](decltype(expected) result)
     {
@@ -283,11 +283,11 @@ namespace libreg
 
 
   template <typename Routine, typename ...Args>
-  inline typename std::result_of<Routine(Args...)>::type SyscallWithExpectedReturn(Routine routine,
-    std::function<bool(typename std::result_of<Routine(Args...)>::type)> pred,
+  inline typename  std::invoke_result_t<Routine, Args...> SyscallWithExpectedReturn(Routine routine,
+    std::function<bool(typename  std::invoke_result_t<Routine, Args...>)> pred,
     Args... args)
   {
-    using ReturnValue = typename std::result_of<Routine(Args...)>::type;
+    using ReturnValue = typename  std::invoke_result_t<Routine, Args...>;
 
     return detail::SyscallImpl<Routine, ReturnValue, Args...>(routine, pred, std::forward<Args>(args)...);
   }

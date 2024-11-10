@@ -16,6 +16,22 @@ TestRegistryOperations::TestRegistryOperations() : Tester("Registry operations")
 
 void TestRegistryOperations::RunImpl()
 {
+
+  bool isElevated = false;
+
+  libreg::Handle<HANDLE> token{ nullptr };
+
+  if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, token.Addr()))
+  {
+    TOKEN_ELEVATION elevation{};
+    DWORD size = sizeof(elevation);
+
+    if (GetTokenInformation(token.Get(), TokenElevation, &elevation, sizeof(elevation), &size))
+    {
+      isElevated = elevation.TokenIsElevated;
+    }
+  }
+
   auto dummy_key = "Software";
 
   auto key = Key::OpenOrCreate(Hive::CurrentUser, dummy_key, Access::AllAccess);
@@ -98,7 +114,7 @@ void TestRegistryOperations::RunImpl()
 
   TestThrow<KeyNotFoundException>([&](){subkey.Delete();}, "Keys can't be deleted twice");
 
-  auto read_only_key = Key::Open(Hive::LocalMachine, "SAM\\SAM", Access::QueryValue);
+  auto read_only_key = Key::Open(Hive::LocalMachine, isElevated ? "BCD00000000" : "Software", Access::QueryValue);
 
   TestThrow<AccessDeniedException>([&]() {read_only_key.CreateSubKey("denied"); },
     "AccessDeniedException is thrown");

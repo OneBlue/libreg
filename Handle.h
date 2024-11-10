@@ -18,6 +18,7 @@ namespace libreg
         const Handle<T>& operator=(const Handle&) = delete;
 
         T Get() const;
+        T* Addr();
         void Detach();
         void Close();
         operator T() const;

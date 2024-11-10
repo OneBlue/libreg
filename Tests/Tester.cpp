@@ -15,7 +15,17 @@ bool Tester::Run()
   cout << Colors::Blue() << Colors::Bold() << "\n\t\t\t======= Tests for \""
         << _category << "\" =======" << endl
         << Colors::Reset();
-  RunImpl();
+
+  try
+
+  {
+    RunImpl();
+  }
+  catch(const std::exception & e)
+  {
+    std::cout << Colors::Red() << "Tests caught unexpected exception: " << e.what() << std::endl;
+    return false;
+  }
 
   return _failed == 0;
 }

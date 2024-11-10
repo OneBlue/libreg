@@ -77,4 +77,10 @@ namespace libreg
     {
         return _value != nullptr;
     }
+
+    template <typename T>
+    inline T* Handle<T>::Addr()
+    {
+      return &_value;
+    }
 }

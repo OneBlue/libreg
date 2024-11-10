@@ -98,14 +98,14 @@ void TestRegistryOperations::RunImpl()
 
   TestThrow<KeyNotFoundException>([&](){subkey.Delete();}, "Keys can't be deleted twice");
 
-  auto read_only_key = Key::Open(Hive::LocalMachine, "Software", Access::QueryValue);
+  auto read_only_key = Key::Open(Hive::LocalMachine, "SAM\\SAM", Access::QueryValue);
 
   TestThrow<AccessDeniedException>([&]() {read_only_key.CreateSubKey("denied"); },
     "AccessDeniedException is thrown");
   TestThrow<KeyNotFoundException>([&]() {read_only_key.OpenSubKey("does-not-exist", Access::Read); },
     "KeyNotFoundException is thrown");
 
-  TestThrow<AccessDeniedException>([&]() {Key::Open(Hive::LocalMachine, "Software", Access::AllAccess); },
+  TestThrow<AccessDeniedException>([&]() {Key::Open(Hive::LocalMachine, "SAM\\SAM", Access::AllAccess); },
     "AccessDeniedException is thrown if key access is refused");
 
   auto top_level_key = Key::Open(Hive::LocalMachine, "", Access::Read);
@@ -114,5 +114,5 @@ void TestRegistryOperations::RunImpl()
   auto result = top_level_key.TryOpenSubKey("DoesntExist", Access::Read);
   Test(false, result.has_value(), "TryOpenSubKey doesn't fail if the key is not found");
 
-  TestThrow<AccessDeniedException>([&]() {top_level_key.OpenSubKey("Software", Access::AllAccess);}, "TryOpenSubkey throws on AccessDenied");
+  TestThrow<AccessDeniedException>([&]() {top_level_key.OpenSubKey("SAM\\SAM", Access::AllAccess);}, "TryOpenSubkey throws on AccessDenied");
 }
